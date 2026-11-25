@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(npm test)",
+      "Bash(npm run lint)",
+      "Bash(npm run typecheck)",
+      "Bash(npm run build)",
+      "Bash(npm run test:coverage)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(docker compose ps*)",
+      "Bash(docker compose logs*)",
+      "Bash(docker compose config*)",
+      "PowerShell(npm test)",
+      "PowerShell(npm run lint)",
+      "PowerShell(npm run typecheck)",
+      "PowerShell(npm run build)",
+      "PowerShell(npm run test:coverage)",
+      "PowerShell(git status*)",
+      "PowerShell(git diff*)",
+      "PowerShell(git log*)",
+      "PowerShell(docker compose ps*)",
+      "PowerShell(docker compose logs*)",
+      "PowerShell(docker compose config*)"
+    ],
+    "ask": [
+      "Bash(git push*)",
+      "Bash(npx supabase db push*)",
+      "Bash(npm run test:live*)",
+      "Bash(docker compose down -v*)",
+      "PowerShell(git push*)",
+      "PowerShell(npx supabase db push*)",
+      "PowerShell(npm run test:live*)",
+      "PowerShell(docker compose down -v*)"
+    ],
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.local)",
+      "Read(certs/*.pem)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(npx supabase db reset*)",
+      "PowerShell(git push --force*)",
+      "PowerShell(git push -f*)",
+      "PowerShell(git reset --hard*)",
+      "PowerShell(npx supabase db reset*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-migrations.mjs\"",
+            "timeout": 10,
+            "statusMessage": "Checking migration safety..."
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-secrets.mjs\"",
+            "timeout": 10,
+            "statusMessage": "Checking for secrets..."
+          }
+        ]
+      }
+    ]
+  }
+}
