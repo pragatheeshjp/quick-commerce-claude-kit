@@ -1,0 +1,34 @@
+# Render Blueprint for the Express API. The frontend is deployed separately on Vercel.
+# Secrets are declared with `sync: false`: Render prompts for them when the Blueprint is first created.
+# Never put real values in this file.
+services:
+  - type: web
+    name: swiftcart-api
+    runtime: node
+    rootDir: backend
+    # Closest Render region to the Supabase project (ap-northeast-2, Seoul). Cannot be changed later.
+    region: singapore
+    # `free` spins down when idle (slow first request). Use a paid plan for production traffic.
+    plan: free
+    # NODE_ENV=production during the build would make a plain `npm ci` skip devDependencies (tsc),
+    # so devDependencies are installed explicitly for the build step.
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/v1/health
+    # Deploy only after the linked branch's GitHub checks (CI) pass.
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: LOG_LEVEL
+        value: info
+      # Exact production frontend origin(s), comma separated, e.g. https://swiftcart.vercel.app
+      - key: CORS_ORIGINS
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      # SERVER-ONLY secret. Never expose to the browser.
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false

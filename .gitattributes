@@ -1,0 +1,13 @@
+# Store text with LF in the repository regardless of each developer's OS/editor settings.
+# (Without this, Windows checkouts mix CRLF and LF and produce noisy diffs.)
+* text=auto eol=lf
+
+# Binary assets: never touch line endings.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary

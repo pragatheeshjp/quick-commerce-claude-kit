@@ -1,0 +1,61 @@
+# Local development stack. Supabase is a managed cloud service (added in Phase 2),
+# so there is deliberately no local database container here.
+name: swiftcart
+
+services:
+  backend:
+    build:
+      context: ./backend
+      target: dev
+      additional_contexts:
+        certs: ./certs
+    ports:
+      - "4000:4000"
+    env_file:
+      - path: ./backend/.env
+        required: false
+    environment:
+      NODE_ENV: development
+      PORT: "4000"
+      CORS_ORIGINS: http://localhost:3000
+    volumes:
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:4000/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+      additional_contexts:
+        certs: ./certs
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: ./frontend/.env
+        required: false
+    environment:
+      # Resolved by the browser, so it points at the host-published backend port.
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+      # Server-side rendering runs inside the container, where the backend is reached by service name.
+      API_INTERNAL_URL: http://backend:4000
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+      - frontend_next:/app/.next
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  backend_node_modules:
+  frontend_node_modules:
+  frontend_next:
+
+
