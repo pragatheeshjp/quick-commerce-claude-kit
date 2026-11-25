@@ -4,6 +4,11 @@ updates:
     directory: /backend
     schedule: { interval: weekly }
     open-pull-requests-limit: 5
+    ignore:
+      # The runtime is Node 22 (Docker, CI, Render). Types for a newer Node would allow APIs that do not exist
+      # at runtime, so @types/node stays on the 22 line. Minor/patch updates are still proposed.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch:
         update-types: [minor, patch]
@@ -11,6 +16,10 @@ updates:
     directory: /frontend
     schedule: { interval: weekly }
     open-pull-requests-limit: 5
+    ignore:
+      # Keep @types/node on the Node 22 line (see the backend entry).
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch:
         update-types: [minor, patch]
