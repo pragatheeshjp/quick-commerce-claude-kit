@@ -75,3 +75,6 @@ Mutation spot-checks were run: production code was deliberately broken in securi
 idempotency key reuse, paise formatting/parsing, bearer-token header, cart owner check, open-redirect guard, admin
 gate, error leakage) and the suite failed every time. If you add a rule like these, break it once on purpose and
 confirm a test notices.
+
+## Local pre-push checks
+The repo's pre-push hook runs the fast subset of these (lint, typecheck, unit tests for the changed app) plus secret/migration/encoding checks before code leaves your machine. See [git-hooks.md](git-hooks.md). Its own logic is tested with `node --test scripts/prepush.test.mjs`.

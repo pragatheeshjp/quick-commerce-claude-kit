@@ -1,0 +1,9 @@
+#!/bin/sh
+# Pre-push hook. All logic lives in scripts/prepush.mjs (documented in docs/git-hooks.md).
+# Git passes "<remote> <url>" as arguments and the refs being pushed on stdin; both are forwarded.
+root="$(git rev-parse --show-toplevel)" || exit 0
+if ! command -v node >/dev/null 2>&1; then
+  echo "pre-push: Node.js was not found, so local checks are skipped (CI still runs them)." >&2
+  exit 0
+fi
+exec node "$root/scripts/prepush.mjs" "$@"

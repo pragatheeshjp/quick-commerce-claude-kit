@@ -9,7 +9,8 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "prepare": "node -e \"const f='../scripts/setup-hooks.mjs';require('fs').existsSync(f)&&import(f).catch(()=>{})\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.2",
