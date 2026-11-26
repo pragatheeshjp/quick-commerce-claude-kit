@@ -9,6 +9,11 @@ updates:
       # at runtime, so @types/node stays on the 22 line. Minor/patch updates are still proposed.
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
+      # TypeScript 7 breaks the toolchain today: typescript-eslint declares a peer range below TS 6.1, so `npm ci`
+      # fails. Remove this rule once typescript-eslint supports TypeScript 7
+      # (tracking issue: https://github.com/typescript-eslint/typescript-eslint/issues/10940).
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch:
         update-types: [minor, patch]
@@ -19,6 +24,10 @@ updates:
     ignore:
       # Keep @types/node on the Node 22 line (see the backend entry).
       - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      # eslint-config-next bundles typescript-eslint, which crashes on TypeScript 7 ("does not support TS 7.0").
+      # Remove once typescript-eslint supports it (see the backend entry for the tracking issue).
+      - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch:
