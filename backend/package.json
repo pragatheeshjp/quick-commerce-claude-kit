@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test:live": "vitest run -c vitest.live.config.mts",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "prepare": "node -e \"const f='../scripts/setup-hooks.mjs';require('fs').existsSync(f)&&import(f).catch(()=>{})\""
   },
   "type": "commonjs",
   "dependencies": {

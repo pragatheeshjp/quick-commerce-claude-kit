@@ -113,6 +113,8 @@ jobs:
           done
           dupes=$(echo "$files" | cut -d_ -f1 | sort | uniq -d)
           [ -z "$dupes" ] || { echo "Duplicate migration timestamps: $dupes"; exit 1; }
+      - name: Pre-push hook logic tests
+        run: node --test scripts/prepush.test.mjs
 
   docker:
     name: Docker images build and start

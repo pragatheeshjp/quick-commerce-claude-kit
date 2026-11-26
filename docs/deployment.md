@@ -8,7 +8,8 @@
 | Source + CI | **GitHub** | `.github/workflows/` |
 
 Docker is for **local parity and CI**. Vercel and Render build from Git natively; they do not use the Dockerfiles
-unless you deliberately switch Render to Docker deployment.
+unless you deliberately switch Render to Docker deployment. **Production does not run containers**: see
+[section 9](#9-docker-and-production-decision-record) for the decision and what switching would involve.
 
 > **Status:** the CI workflow and config files in this repo were validated locally (workflow lint, clean-checkout
 > run of the same commands in Node 22, secret/ignore checks). Nothing has been deployed yet: no GitHub repo,
@@ -166,3 +167,42 @@ Do not call a release successful until you have observed each of these on the de
 | Local `.env` files | your machine | Git (ignored; CI fails if tracked) |
 
 If a secret is ever exposed, rotate it in Supabase immediately and update Render.
+
+## 9. Docker and production (decision record)
+
+**Decision: production runs without containers.** The API runs on Render's native Node runtime and the frontend on
+Vercel's native Next.js hosting. Docker is used for local development and as a CI check only.
+
+| Where | Docker? | How |
+|---|---|---|
+| Local development | **Yes** | `compose.yaml` runs both apps from the `dev` stages of the Dockerfiles, with hot reload |
+| CI | **Yes, as a test** | The Docker job builds the production (`runner`) stages of both images, starts them with placeholder credentials, and checks health and the non-root user. The images are discarded; nothing is pushed to a registry |
+| API on Render | **No** | `render.yaml` sets `runtime: node`; Render runs `npm ci --include=dev && npm run build`, then `npm start` |
+| Frontend on Vercel | **No** | Vercel builds Next.js itself. `output: "standalone"` in `next.config.ts` exists for the Docker image and is ignored by Vercel |
+
+### Why native
+- Vercel and Render both deploy straight from Git, so there is no registry, image tagging, or image-update process to
+  maintain while there is one service and one developer.
+- Docker still gives local/CI parity: the same Node 22 and the same install commands in both places.
+
+### What already exists but is not deployed
+Each Dockerfile has a `runner` stage: Node 22 Alpine, a non-root `app` user, a health check, and no dev tooling or
+secrets (configuration is passed as runtime environment variables; `NEXT_PUBLIC_*` values are build arguments).
+These stages are built and smoke-tested on every CI run, so they are a ready, verified option, not a live path.
+
+### If we ever deploy containers
+Render can deploy from a Dockerfile (use `runtime: docker` in the blueprint and check Render's Blueprint reference for
+the exact Docker fields; not verified here). **Before switching:**
+1. **Fix the `certs` build context.** Both Dockerfiles use `COPY --from=certs`, a named build context supplied only by
+   `compose.yaml` and the CI commands (`--build-context certs=./certs`, used to trust a local antivirus CA). A plain
+   `docker build` on a platform does not provide it and fails. Declare an empty default stage at the top of each
+   Dockerfile (`FROM scratch AS certs`) so the context becomes optional, then re-run the CI Docker job.
+2. Set the production variables on the platform (never in the image), and for the frontend pass the `NEXT_PUBLIC_*`
+   values as build arguments; they are inlined at build time.
+3. Vercel does not run Docker images, so a containerised frontend would need a different host.
+
+**Trade-offs:** you would run exactly the image CI tested, with the same non-root user and health check, but deploys
+become slower and there is more to maintain.
+
+**Revisit when:** you need identical runtime parity across environments, you add services that benefit from
+containers, or you move off Render/Vercel.

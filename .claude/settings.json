@@ -46,7 +46,15 @@
       "PowerShell(git push --force*)",
       "PowerShell(git push -f*)",
       "PowerShell(git reset --hard*)",
-      "PowerShell(npx supabase db reset*)"
+      "PowerShell(npx supabase db reset*)",
+      "Bash(git push*--no-verify*)",
+      "PowerShell(git push*--no-verify*)",
+      "Bash(*SKIP_PREPUSH*)",
+      "PowerShell(*SKIP_PREPUSH*)",
+      "Bash(*ALLOW_PUSH_TO_MAIN*)",
+      "PowerShell(*ALLOW_PUSH_TO_MAIN*)",
+      "Bash(*ALLOW_MIGRATION_EDIT*)",
+      "PowerShell(*ALLOW_MIGRATION_EDIT*)"
     ]
   },
   "hooks": {
