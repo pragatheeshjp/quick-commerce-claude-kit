@@ -46,6 +46,15 @@ tests/              vitest + Testing Library
 - Safe redirects: the post-login `next` parameter must be a same-site relative path.
 - No Google Fonts: system font stack, so builds need no external network.
 
+## Light and dark theme
+- The sun/moon button in the header (`components/theme-toggle.tsx`) switches themes. The choice is saved in
+  `localStorage` (`theme`); with no saved choice the site follows the OS `prefers-color-scheme`.
+- The theme is the `data-theme` attribute on `<html>`. An inline script in `app/layout.tsx` (`lib/theme.ts`)
+  sets it before first paint, so there is no light flash on reload.
+- Components do **not** use `dark:` classes. `globals.css` remaps the Tailwind palette variables under
+  `[data-theme="dark"]` (white/stone-50 become dark surfaces; zinc, emerald, red and amber scales are mirrored).
+  Keep using the existing palette; if you introduce a new colour family, add its dark mapping there.
+
 ## Commands
 `npm run dev` | `npm run build` | `npm run lint` | `npm run typecheck` | `npm test`
 

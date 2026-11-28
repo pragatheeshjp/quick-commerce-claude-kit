@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/features/auth/auth-provider";
 import { useCart } from "@/features/cart/cart-provider";
 import { LocationPicker } from "@/features/location/location-picker";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 function CartLink() {
   const { itemCount } = useCart();
@@ -58,6 +59,7 @@ export function Header() {
           />
         </form>
         <div className="ml-auto flex items-center gap-1">
+          <ThemeToggle />
           <CartLink />
           <AccountLink />
         </div>
